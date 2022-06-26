@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import logica.Baldosa;
 import logica.Juego;
 
@@ -33,6 +34,9 @@ public class VentanaPrincipal extends JFrame{
     private JLabel lblPlay;
     private JLabel lblInfo;
     private JLabel lblExit;
+    private JLabel lblPuntaje;
+    private JLabel lblVidas;
+    private JLabel lblBoton;
     private JButton btnNext;
     private JButton btnBack;
     private int seccion;
@@ -40,6 +44,8 @@ public class VentanaPrincipal extends JFrame{
     private Juego miJuego;
     private ImageIcon[] imagenes = new ImageIcon[20];
     private JLabel[] lblBaldosas = new JLabel[8];
+    
+    private Timer timerGame;
     
     private Container contenedorInicial;
     public VentanaPrincipal()
@@ -86,6 +92,24 @@ public class VentanaPrincipal extends JFrame{
         lblExit.setVisible(false);
         lblExit.setEnabled(false);
         
+        lblPuntaje = new JLabel("");
+        lblPuntaje.setBounds(30,20,200,30);
+        lblPuntaje.setFont(new Font("Serif", Font.PLAIN, 20));
+        lblPuntaje.setVisible(false);
+        lblPuntaje.setEnabled(false);
+        
+        lblVidas = new JLabel("");
+        lblVidas.setBounds(500,20,100,30);
+        lblVidas.setFont(new Font("Serif", Font.PLAIN, 20));
+        lblVidas.setVisible(false);
+        lblVidas.setEnabled(false);
+        
+        lblBoton = new JLabel("X");
+        lblBoton.setBounds(600,600,40,40);
+        lblBoton.setFont(new Font("Serif", Font.PLAIN, 35));
+        lblBoton.setVisible(false);
+        lblBoton.setEnabled(false);
+        
         btnNext = new JButton("Siguiente");
         btnNext.setBounds(500, 550, 100, 30);
         btnNext.setVisible(false);
@@ -93,6 +117,17 @@ public class VentanaPrincipal extends JFrame{
         btnBack = new JButton("Atras");
         btnBack.setBounds(50,550,100,30);
         btnBack.setVisible(false);
+        
+        timerGame = new Timer(2000,((e) -> {
+            System.out.println("Inicia :" + miJuego.getAccion());
+            miJuego.compararBaldosas();
+            lblPuntaje.setText("Puntaje: " + miJuego.getPuntaje());
+            lblVidas.setText("Vidas: " + miJuego.getNumVidas());
+            miJuego.cambiarBaldosa();
+            pintar();
+            miJuego.setAccion(false);
+            SwingUtilities.updateComponentTreeUI(contenedorInicial);
+        }));
         
         contenedorInicial = getContentPane();
         contenedorInicial.setLayout(null);
@@ -102,6 +137,9 @@ public class VentanaPrincipal extends JFrame{
         contenedorInicial.add(lblPlay);
         contenedorInicial.add(lblExit);
         contenedorInicial.add(lblInfo);
+        contenedorInicial.add(lblPuntaje);
+        contenedorInicial.add(lblVidas);
+        contenedorInicial.add(lblBoton);
         contenedorInicial.add(btnNext);
         contenedorInicial.add(btnBack);
         posicionarLblBaldosas();
@@ -110,6 +148,7 @@ public class VentanaPrincipal extends JFrame{
         lblWP.addMouseListener(new ManejadorEventosMouse());
         lblPlay.addMouseListener(new ManejadorEventosMouse());
         lblExit.addMouseListener(new ManejadorEventosMouse());
+        lblBoton.addMouseListener(new ManejadorEventosMouse());
         btnNext.addMouseListener(new ManejadorEventosMouse());
         btnBack.addMouseListener(new ManejadorEventosMouse());
     }
@@ -172,11 +211,12 @@ public class VentanaPrincipal extends JFrame{
     }
     
     public void pintar(){
+        for(int i = 0; i < lblBaldosas.length;i++){
+            lblBaldosas[i].setIcon(null);
+        }
         for(Baldosa baldosa : miJuego.getBaldosas()){
-            int posicion = baldosa.getPosicion();
-            System.out.println(posicion);
-            System.out.println(baldosa.getID());
-            lblBaldosas[posicion-1].setIcon(imagenes[baldosa.getID()]);
+            lblBaldosas[baldosa.getPosicion()-1].
+                                    setIcon(imagenes[baldosa.getID()]);
         }
     }
     
@@ -272,17 +312,31 @@ public class VentanaPrincipal extends JFrame{
         
         lblTitle.setText("");
         lblTitle.setVisible(false);
+        
         lblHTP.setEnabled(false);
         lblWP.setEnabled(false);
         lblPlay.setEnabled(false);
+        lblPuntaje.setEnabled(true);
+        lblVidas.setEnabled(true);
+        lblBoton.setEnabled(true);
+        
         lblHTP.setVisible(false);
         lblWP.setVisible(false);
         lblPlay.setVisible(false);
+        lblPuntaje.setVisible(true);
+        lblVidas.setVisible(true);
+        lblBoton.setVisible(true);
         
         mostrarBaldosas();
         miJuego = new Juego();
         
+        lblPuntaje.setText("Puntaje: " + miJuego.getPuntaje());
+        lblVidas.setText("Vidas: " + miJuego.getNumVidas());
+        
         pintar();
+        timerGame.start();
+        
+        SwingUtilities.updateComponentTreeUI(contenedorInicial);
     }
     
     
@@ -336,6 +390,10 @@ public class VentanaPrincipal extends JFrame{
             }
             if(e.getSource() == lblPlay){
                 iniciarJuego();
+            }
+            if(e.getSource() == lblBoton){
+                miJuego.setAccion(true);
+                System.out.println("Presionado");
             }
         }
 
