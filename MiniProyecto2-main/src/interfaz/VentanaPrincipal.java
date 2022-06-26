@@ -5,10 +5,13 @@
 package interfaz;
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Iterator;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,6 +19,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import logica.Baldosa;
+import logica.Juego;
 
 /**
  *
@@ -31,6 +36,10 @@ public class VentanaPrincipal extends JFrame{
     private JButton btnNext;
     private JButton btnBack;
     private int seccion;
+    
+    private Juego miJuego;
+    private ImageIcon[] imagenes = new ImageIcon[20];
+    private JLabel[] lblBaldosas = new JLabel[8];
     
     private Container contenedorInicial;
     public VentanaPrincipal()
@@ -48,6 +57,7 @@ public class VentanaPrincipal extends JFrame{
     
     private void iniciarComponentes()
     {
+        cargarImagenes();
         seccion = 0;
         
         lblTitle = new JLabel("Pair Colors", SwingConstants.CENTER);
@@ -94,12 +104,80 @@ public class VentanaPrincipal extends JFrame{
         contenedorInicial.add(lblInfo);
         contenedorInicial.add(btnNext);
         contenedorInicial.add(btnBack);
+        posicionarLblBaldosas();
         
         lblHTP.addMouseListener(new ManejadorEventosMouse());
         lblWP.addMouseListener(new ManejadorEventosMouse());
+        lblPlay.addMouseListener(new ManejadorEventosMouse());
         lblExit.addMouseListener(new ManejadorEventosMouse());
         btnNext.addMouseListener(new ManejadorEventosMouse());
         btnBack.addMouseListener(new ManejadorEventosMouse());
+    }
+    
+    public void cargarImagenes(){
+        int i = 0;
+        for (ImageIcon imagen : imagenes){
+            try {
+                imagen = new ImageIcon(getClass().getResource
+                                        ("/imagenes/"+(i+1)+".png"));
+            } catch (Exception e) {
+                imagen = new ImageIcon(getClass().getResource
+                                        ("/imagenes/"+(i+1)+".jpg"));
+            }
+            Image image = (imagen).getImage().getScaledInstance
+                                        (80, 80, Image.SCALE_SMOOTH);
+            imagenes[i]= new ImageIcon(image);
+            i++;
+        }
+    }
+    
+    public void posicionarLblBaldosas(){
+        lblBaldosas[0] = new JLabel();
+        lblBaldosas[0].setBounds(300,30,80,80);
+        
+        lblBaldosas[1] = new JLabel();
+        lblBaldosas[1].setBounds(300,130,80,80);
+        
+        lblBaldosas[2] = new JLabel();
+        lblBaldosas[2].setBounds(70,250,80,80);
+        
+        lblBaldosas[3] = new JLabel();
+        lblBaldosas[3].setBounds(170,250,80,80);
+        
+        lblBaldosas[4] = new JLabel();
+        lblBaldosas[4].setBounds(430,250,80,80);
+        
+        lblBaldosas[5] = new JLabel();
+        lblBaldosas[5].setBounds(530,250,80,80);
+        
+        lblBaldosas[6] = new JLabel();
+        lblBaldosas[6].setBounds(300,370,80,80);
+        
+        lblBaldosas[7] = new JLabel();
+        lblBaldosas[7].setBounds(300,470,80,80);
+        
+        for(JLabel baldosa : lblBaldosas){
+            baldosa.setEnabled(false);
+            baldosa.setVisible(false);
+            
+            contenedorInicial.add(baldosa);
+        }
+    }
+    
+    public void mostrarBaldosas(){
+        for(JLabel baldosa : lblBaldosas){
+            baldosa.setEnabled(true);
+            baldosa.setVisible(true);
+        }
+    }
+    
+    public void pintar(){
+        for(Baldosa baldosa : miJuego.getBaldosas()){
+            int posicion = baldosa.getPosicion();
+            System.out.println(posicion);
+            System.out.println(baldosa.getID());
+            lblBaldosas[posicion-1].setIcon(imagenes[baldosa.getID()]);
+        }
     }
     
     public void seccionTutorial(){
@@ -190,6 +268,25 @@ public class VentanaPrincipal extends JFrame{
         lblInfo.setText("");
     }
     
+    public void iniciarJuego(){
+        
+        lblTitle.setText("");
+        lblTitle.setVisible(false);
+        lblHTP.setEnabled(false);
+        lblWP.setEnabled(false);
+        lblPlay.setEnabled(false);
+        lblHTP.setVisible(false);
+        lblWP.setVisible(false);
+        lblPlay.setVisible(false);
+        
+        mostrarBaldosas();
+        miJuego = new Juego();
+        
+        pintar();
+    }
+    
+    
+    
     class ManejadorEventosMouse implements MouseListener{
 
         @Override
@@ -236,6 +333,9 @@ public class VentanaPrincipal extends JFrame{
             }
             if(e.getSource() == lblExit){
                 menuPrincipal();
+            }
+            if(e.getSource() == lblPlay){
+                iniciarJuego();
             }
         }
 

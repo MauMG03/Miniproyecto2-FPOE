@@ -15,16 +15,25 @@ public class Juego {
     private ArrayList <Baldosa> baldosas;
     private ArrayList <Integer> posiciones; 
     private int numVidas;
+    private int puntaje;
     
-    Juego()
+    public Juego()
     {
-        numVidas = 0;
-        for(int i = 0; i <= 3;i++){
+        numVidas = 3;
+        puntaje = 0;
+        baldosas = new ArrayList<Baldosa>();
+        posiciones = new ArrayList<Integer>();
+        for(int i = 0; i < 3;i++){
             baldosas.add(new Baldosa());
         }
         for(int i = 1; i <= 8;i++){
             posiciones.add(i);
         }
+        iniciarJuego();
+    }
+    
+    public ArrayList <Baldosa> getBaldosas(){
+        return baldosas;
     }
     
     public void iniciarJuego(){
@@ -35,10 +44,12 @@ public class Juego {
     }
     
     public void asignarPosiciones(){
+        int i = baldosas.size();
         for(Baldosa baldosa : baldosas){
-            int random = (int)(Math.random() * baldosas.size());
-            baldosa.setPosicion(posiciones.get(random - 1));
-            posiciones.remove(random - 1);
+            int random = (int)(Math.random() * i);
+            baldosa.setPosicion(posiciones.get(random));
+            posiciones.remove(random);
+            i--;
         }
     }
     
