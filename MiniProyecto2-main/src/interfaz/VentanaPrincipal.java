@@ -8,6 +8,8 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Iterator;
@@ -37,6 +39,9 @@ public class VentanaPrincipal extends JFrame{
     private JLabel lblPuntaje;
     private JLabel lblVidas;
     private JLabel lblBoton;
+    private JLabel lblPuntajeFinal;
+    private JLabel lblErrores;
+    private JLabel lblAciertos;
     private JButton btnNext;
     private JButton btnBack;
     private int seccion;
@@ -68,7 +73,7 @@ public class VentanaPrincipal extends JFrame{
         
         lblTitle = new JLabel("Pair Colors", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Serif", Font.PLAIN, 50));
-        lblTitle.setBounds(180,50,320,70);
+        lblTitle.setBounds(90,50,500,70);
         
         lblHTP = new JLabel("Como Jugar");
         lblHTP.setFont(new Font("Serif", Font.PLAIN, 40));
@@ -110,6 +115,21 @@ public class VentanaPrincipal extends JFrame{
         lblBoton.setVisible(false);
         lblBoton.setEnabled(false);
         
+        lblPuntajeFinal = new JLabel("Puntaje final: ", SwingConstants.CENTER);
+        lblPuntajeFinal.setFont(new Font("Serif", Font.PLAIN, 40));
+        lblPuntajeFinal.setBounds(180,220,320,70);
+        lblPuntajeFinal.setVisible(false);
+        
+        lblAciertos = new JLabel("Aciertos: ", SwingConstants.CENTER);
+        lblAciertos.setFont(new Font("Serif", Font.PLAIN, 40));
+        lblAciertos.setBounds(180,320,320,70);
+        lblAciertos.setVisible(false);
+        
+        lblErrores = new JLabel("Errores: ", SwingConstants.CENTER);
+        lblErrores.setFont(new Font("Serif", Font.PLAIN, 40));
+        lblErrores.setBounds(180,420,320,70);
+        lblErrores.setVisible(false);
+        
         btnNext = new JButton("Siguiente");
         btnNext.setBounds(500, 550, 100, 30);
         btnNext.setVisible(false);
@@ -119,8 +139,8 @@ public class VentanaPrincipal extends JFrame{
         btnBack.setVisible(false);
         
         timerGame = new Timer(2000,((e) -> {
-            System.out.println("Inicia :" + miJuego.getAccion());
             miJuego.compararBaldosas();
+            finDelJuego();
             lblPuntaje.setText("Puntaje: " + miJuego.getPuntaje());
             lblVidas.setText("Vidas: " + miJuego.getNumVidas());
             miJuego.cambiarBaldosa();
@@ -140,17 +160,21 @@ public class VentanaPrincipal extends JFrame{
         contenedorInicial.add(lblPuntaje);
         contenedorInicial.add(lblVidas);
         contenedorInicial.add(lblBoton);
+        contenedorInicial.add(lblPuntajeFinal);
+        contenedorInicial.add(lblAciertos);
+        contenedorInicial.add(lblErrores);
         contenedorInicial.add(btnNext);
         contenedorInicial.add(btnBack);
         posicionarLblBaldosas();
         
-        lblHTP.addMouseListener(new ManejadorEventosMouse());
-        lblWP.addMouseListener(new ManejadorEventosMouse());
-        lblPlay.addMouseListener(new ManejadorEventosMouse());
-        lblExit.addMouseListener(new ManejadorEventosMouse());
-        lblBoton.addMouseListener(new ManejadorEventosMouse());
-        btnNext.addMouseListener(new ManejadorEventosMouse());
-        btnBack.addMouseListener(new ManejadorEventosMouse());
+        lblHTP.addMouseListener(new ManejadorEventos());
+        lblWP.addMouseListener(new ManejadorEventos());
+        lblPlay.addMouseListener(new ManejadorEventos());
+        lblExit.addMouseListener(new ManejadorEventos());
+        lblBoton.addMouseListener(new ManejadorEventos());
+        btnNext.addMouseListener(new ManejadorEventos());
+        btnBack.addMouseListener(new ManejadorEventos());
+        this.addKeyListener(new ManejadorEventos());
     }
     
     public void cargarImagenes(){
@@ -329,6 +353,7 @@ public class VentanaPrincipal extends JFrame{
         
         mostrarBaldosas();
         miJuego = new Juego();
+        seccion = 5;
         
         lblPuntaje.setText("Puntaje: " + miJuego.getPuntaje());
         lblVidas.setText("Vidas: " + miJuego.getNumVidas());
@@ -339,9 +364,35 @@ public class VentanaPrincipal extends JFrame{
         SwingUtilities.updateComponentTreeUI(contenedorInicial);
     }
     
+    public void finDelJuego(){
+        if(miJuego.getFinDelJuego()){
+            timerGame.stop();
+            
+            for(int i = 0; i < lblBaldosas.length;i++){
+                lblBaldosas[i].setIcon(null);
+                lblBaldosas[i].setVisible(false);
+            }
+            
+            lblPuntaje.setVisible(false);
+            lblVidas.setVisible(false);
+            lblBoton.setVisible(false);
+            lblBoton.setEnabled(false);
+            lblTitle.setVisible(true);
+            
+            lblPuntajeFinal.setVisible(true);
+            lblAciertos.setVisible(true);
+            lblErrores.setVisible(true);
+            
+            lblTitle.setText("FIN DEL JUEGO");
+            lblPuntajeFinal.setText("Puntaje: " + miJuego.getPuntaje());
+            lblAciertos.setText("Aciertos: " + miJuego.getAciertos());
+            lblErrores.setText("Errores: " + miJuego.getErrores());
+            
+            SwingUtilities.updateComponentTreeUI(contenedorInicial);
+        }
+    }
     
-    
-    class ManejadorEventosMouse implements MouseListener{
+    class ManejadorEventos extends KeyAdapter implements MouseListener{
 
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -414,8 +465,15 @@ public class VentanaPrincipal extends JFrame{
 
         @Override
         public void mouseExited(MouseEvent e) {
-        
         }
         
+        @Override
+        public void keyPressed(KeyEvent ke){
+            if(seccion == 5){
+                if(ke.getKeyCode() == 32){
+                    miJuego.setAccion(true);
+                }
+            }           
+        }
     }
 }

@@ -16,13 +16,19 @@ public class Juego {
     private ArrayList <Integer> posiciones; 
     private int numVidas;
     private int puntaje;
+    private int aciertos;
+    private int errores;
     private boolean accion;
+    private boolean finDelJuego;
     
     public Juego()
     {
         numVidas = 3;
         puntaje = 0;
+        aciertos = 0;
+        errores = 0;
         accion = false;
+        finDelJuego = false;
         baldosas = new ArrayList<Baldosa>();
         posiciones = new ArrayList<Integer>();
         for(int i = 0; i < 3;i++){
@@ -52,6 +58,18 @@ public class Juego {
     
     public boolean getAccion(){
         return accion;
+    }
+    
+    public boolean getFinDelJuego(){
+        return finDelJuego;
+    }
+    
+    public int getAciertos(){
+        return aciertos;
+    }
+    
+    public int getErrores(){
+        return errores;
     }
     
     public void iniciarJuego(){
@@ -97,16 +115,22 @@ public class Juego {
         cambiarIDs();
         puntaje += 100;
         accion = false;
+        aciertos += 1;
     }
     
     public void fallo(){
         numVidas -= 1;
-        desasignarPosiciones();
-        if(baldosas.size() > 3){
-            baldosas.remove(baldosas.size() - 1);
+        errores += 1;
+        if(numVidas == 0){
+            finDelJuego = true;
+        }else{
+            desasignarPosiciones();
+            if(baldosas.size() > 3){
+                baldosas.remove(baldosas.size() - 1);
+            }
+            asignarPosiciones();
+            cambiarIDs();
         }
-        asignarPosiciones();
-        cambiarIDs();
     }
        
     public void compararBaldosas(){
