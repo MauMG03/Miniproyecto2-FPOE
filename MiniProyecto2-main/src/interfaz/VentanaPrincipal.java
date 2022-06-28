@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package interfaz;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.Image;
@@ -12,7 +13,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.RoundRectangle2D;
 import java.util.Iterator;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.border.Border;
 import logica.Baldosa;
 import logica.Juego;
 
@@ -138,17 +142,6 @@ public class VentanaPrincipal extends JFrame{
         btnBack.setBounds(50,550,100,30);
         btnBack.setVisible(false);
         
-        timerGame = new Timer(2000,((e) -> {
-            miJuego.compararBaldosas();
-            finDelJuego();
-            lblPuntaje.setText("Puntaje: " + miJuego.getPuntaje());
-            lblVidas.setText("Vidas: " + miJuego.getNumVidas());
-            miJuego.cambiarBaldosa();
-            pintar();
-            miJuego.setAccion(false);
-            SwingUtilities.updateComponentTreeUI(contenedorInicial);
-        }));
-        
         contenedorInicial = getContentPane();
         contenedorInicial.setLayout(null);
         contenedorInicial.add(lblTitle);
@@ -218,7 +211,7 @@ public class VentanaPrincipal extends JFrame{
         
         lblBaldosas[7] = new JLabel();
         lblBaldosas[7].setBounds(300,470,80,80);
-        
+      
         for(JLabel baldosa : lblBaldosas){
             baldosa.setEnabled(false);
             baldosa.setVisible(false);
@@ -359,9 +352,40 @@ public class VentanaPrincipal extends JFrame{
         lblVidas.setText("Vidas: " + miJuego.getNumVidas());
         
         pintar();
+        
+        timerGame = new Timer(miJuego.getTiempo(),((e) -> {
+            miJuego.compararBaldosas();
+            disminuirTiempo();
+            finDelJuego();
+            lblPuntaje.setText("Puntaje: " + miJuego.getPuntaje());
+            lblVidas.setText("Vidas: " + miJuego.getNumVidas());
+            miJuego.cambiarBaldosa();
+            pintar();
+            miJuego.setAccion(false);
+            SwingUtilities.updateComponentTreeUI(contenedorInicial);
+        }));
+        
         timerGame.start();
         
         SwingUtilities.updateComponentTreeUI(contenedorInicial);
+    }
+    
+    public void disminuirTiempo(){
+        if(miJuego.getHayAcierto()){
+            timerGame.stop();
+            timerGame = new Timer(miJuego.getTiempo(),((e) -> {
+                miJuego.compararBaldosas();
+                disminuirTiempo();
+                finDelJuego();
+                lblPuntaje.setText("Puntaje: " + miJuego.getPuntaje());
+                lblVidas.setText("Vidas: " + miJuego.getNumVidas());
+                miJuego.cambiarBaldosa();
+                pintar();
+                miJuego.setAccion(false);
+                SwingUtilities.updateComponentTreeUI(contenedorInicial);
+            }));
+            timerGame.start();
+        }
     }
     
     public void finDelJuego(){

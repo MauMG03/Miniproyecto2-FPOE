@@ -13,12 +13,15 @@ import java.util.ArrayList;
 public class Juego {
     
     private ArrayList <Baldosa> baldosas;
-    private ArrayList <Integer> posiciones; 
+    private ArrayList <Integer> posiciones;
+    private ArrayList <Integer> idBaldosas;
     private int numVidas;
     private int puntaje;
     private int aciertos;
     private int errores;
+    private int tiempo;
     private boolean accion;
+    private boolean hayAcierto;
     private boolean finDelJuego;
     
     public Juego()
@@ -27,15 +30,21 @@ public class Juego {
         puntaje = 0;
         aciertos = 0;
         errores = 0;
+        tiempo = 3000;
         accion = false;
+        hayAcierto = false;
         finDelJuego = false;
         baldosas = new ArrayList<Baldosa>();
         posiciones = new ArrayList<Integer>();
+        idBaldosas = new ArrayList<Integer>();
         for(int i = 0; i < 3;i++){
             baldosas.add(new Baldosa());
         }
         for(int i = 1; i <= 8;i++){
             posiciones.add(i);
+        }
+        for(int i = 1; i <20;i++){
+            idBaldosas.add(i);
         }
         iniciarJuego();
     }
@@ -72,10 +81,16 @@ public class Juego {
         return errores;
     }
     
+    public int getTiempo(){
+        return tiempo;
+    }
+    
+    public boolean getHayAcierto(){
+        return hayAcierto;
+    }
+    
     public void iniciarJuego(){
-        for(Baldosa baldosa : baldosas){
-            baldosa.setID();
-        }
+        cambiarIDs();
         asignarPosiciones();
     }
     
@@ -96,7 +111,12 @@ public class Juego {
     
     public void cambiarIDs(){
         for(Baldosa baldosa : baldosas){
-            baldosa.setID();
+            int random = (int)(Math.random() * idBaldosas.size());
+            baldosa.setIDFijo(idBaldosas.get(random));
+            idBaldosas.remove(idBaldosas.get(random));
+        }
+        for(Baldosa baldosa : baldosas){
+            idBaldosas.add(baldosa.getID());
         }
     }
     
@@ -116,6 +136,8 @@ public class Juego {
         puntaje += 100;
         accion = false;
         aciertos += 1;
+        tiempo = tiempo - (tiempo*5/100);
+        hayAcierto = true;
     }
     
     public void fallo(){

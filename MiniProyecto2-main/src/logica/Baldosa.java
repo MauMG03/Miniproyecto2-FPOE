@@ -21,6 +21,10 @@ public class Baldosa {
         id = (int)(Math.random()*20);
     }
     
+    public void setIDFijo(int id){
+        this.id = id;
+    }
+    
     public int getID(){
         return id;
     }
