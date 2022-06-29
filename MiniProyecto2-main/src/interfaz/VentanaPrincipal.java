@@ -7,21 +7,15 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.geom.RoundRectangle2D;
-import java.util.Iterator;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -49,12 +43,15 @@ public class VentanaPrincipal extends JFrame{
     private JButton btnNext;
     private JButton btnBack;
     private int seccion;
+    private int pausa;
     
     private Juego miJuego;
     private ImageIcon[] imagenes = new ImageIcon[20];
     private JLabel[] lblBaldosas = new JLabel[8];
     
     private Timer timerGame;
+    private Timer entreRonda;
+    
     
     private Container contenedorInicial;
     public VentanaPrincipal()
@@ -74,6 +71,7 @@ public class VentanaPrincipal extends JFrame{
     {
         cargarImagenes();
         seccion = 0;
+        pausa = 0;
         
         lblTitle = new JLabel("Pair Colors", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Serif", Font.PLAIN, 50));
@@ -189,28 +187,28 @@ public class VentanaPrincipal extends JFrame{
     
     public void posicionarLblBaldosas(){
         lblBaldosas[0] = new JLabel();
-        lblBaldosas[0].setBounds(300,30,80,80);
+        lblBaldosas[0].setBounds(300,30,85,85);
         
         lblBaldosas[1] = new JLabel();
-        lblBaldosas[1].setBounds(300,130,80,80);
+        lblBaldosas[1].setBounds(300,130,85,85);
         
         lblBaldosas[2] = new JLabel();
-        lblBaldosas[2].setBounds(70,250,80,80);
+        lblBaldosas[2].setBounds(70,250,85,85);
         
         lblBaldosas[3] = new JLabel();
-        lblBaldosas[3].setBounds(170,250,80,80);
+        lblBaldosas[3].setBounds(170,250,85,85);
         
         lblBaldosas[4] = new JLabel();
-        lblBaldosas[4].setBounds(430,250,80,80);
+        lblBaldosas[4].setBounds(430,250,85,85);
         
         lblBaldosas[5] = new JLabel();
-        lblBaldosas[5].setBounds(530,250,80,80);
+        lblBaldosas[5].setBounds(530,250,85,85);
         
         lblBaldosas[6] = new JLabel();
-        lblBaldosas[6].setBounds(300,370,80,80);
+        lblBaldosas[6].setBounds(300,370,85,85);
         
         lblBaldosas[7] = new JLabel();
-        lblBaldosas[7].setBounds(300,470,80,80);
+        lblBaldosas[7].setBounds(300,470,85,85);
       
         for(JLabel baldosa : lblBaldosas){
             baldosa.setEnabled(false);
@@ -228,12 +226,93 @@ public class VentanaPrincipal extends JFrame{
     }
     
     public void pintar(){
+        
         for(int i = 0; i < lblBaldosas.length;i++){
             lblBaldosas[i].setIcon(null);
+            lblBaldosas[i].setBorder(null);
         }
         for(Baldosa baldosa : miJuego.getBaldosas()){
             lblBaldosas[baldosa.getPosicion()-1].
                                     setIcon(imagenes[baldosa.getID()]);
+        }
+        
+        Border border = BorderFactory.createLineBorder(Color.GRAY, 3,true);
+        Border borderG = BorderFactory.createLineBorder(Color.GREEN, 3,true);
+        Border borderR = BorderFactory.createLineBorder(Color.RED, 3,true);
+        
+        if(miJuego.getBaldosaCambiada() == 0){
+            lblBaldosas[miJuego.getBaldosaCambiada()].setBorder(border);
+        }
+        else if(miJuego.getBaldosaCambiada() > 0){
+            lblBaldosas[miJuego.getBaldosaCambiada()-1].setBorder(border);
+        }
+        else{
+            //no pinta borde
+        }
+        if(miJuego.getHayAcierto()){
+            for(int i = 0; i < miJuego.getBaldosas().size();i++){
+                for(int j = 0; j < miJuego.getBaldosas().size();j++){
+                    if(i == j){
+                        //No pinta borde
+                    }
+                    else if(miJuego.getBaldosas().get(i).getID() == 
+                            miJuego.getBaldosas().get(j).getID()){
+                        int pI = miJuego.getBaldosas().get(i).getPosicion();
+                        int pJ = miJuego.getBaldosas().get(j).getPosicion();
+                        pintarBordesPares(borderG, pI, pJ);
+                        timerGame.stop();
+                    }
+                }
+            }
+        }
+        if(miJuego.getHayFallo()){
+            for(int i = 0; i < miJuego.getBaldosas().size();i++){
+                for(int j = 0; j < miJuego.getBaldosas().size();j++){
+                    if(i == miJuego.getBaldosas().size()-1 &&
+                            j == miJuego.getBaldosas().size()-1){
+                        for(int k = 0; k< miJuego.getBaldosas().size();k++){
+                            if(miJuego.getBaldosas().get(k).getPosicion() == 0){
+                                lblBaldosas[miJuego.getBaldosas().get(k).
+                                        getPosicion()].setBorder(borderR);
+                            }
+                            else{
+                                lblBaldosas[miJuego.getBaldosas().get(k).
+                                        getPosicion()-1].setBorder(borderR);
+                            }
+                        }
+                    }
+                    else if(i == j){
+                        //No pinta borde
+                    }
+                    else if(miJuego.getBaldosas().get(i).getID() == 
+                            miJuego.getBaldosas().get(j).getID()){
+                        int pI = miJuego.getBaldosas().get(i).getPosicion();
+                        int pJ = miJuego.getBaldosas().get(j).getPosicion();
+                        pintarBordesPares(borderR, pI, pJ);
+                        timerGame.stop();
+                        i = miJuego.getBaldosas().size();
+                        j = miJuego.getBaldosas().size();
+                    }
+                }
+            }
+        }
+    }
+    
+    public void pintarBordesPares(Border borde,int i,int j){
+        for(int k = 0; k < lblBaldosas.length; k++){
+            lblBaldosas[k].setBorder(null);
+        }
+        if(i == 0){
+            lblBaldosas[i].setBorder(borde);
+            lblBaldosas[j].setBorder(borde);
+        }
+        else if(j == 0){
+            lblBaldosas[i-1].setBorder(borde);
+            lblBaldosas[j].setBorder(borde);
+        }
+        else{
+            lblBaldosas[i-1].setBorder(borde);
+            lblBaldosas[j-1].setBorder(borde);
         }
     }
     
@@ -354,35 +433,67 @@ public class VentanaPrincipal extends JFrame{
         pintar();
         
         timerGame = new Timer(miJuego.getTiempo(),((e) -> {
-            miJuego.compararBaldosas();
-            disminuirTiempo();
-            finDelJuego();
-            lblPuntaje.setText("Puntaje: " + miJuego.getPuntaje());
-            lblVidas.setText("Vidas: " + miJuego.getNumVidas());
-            miJuego.cambiarBaldosa();
-            pintar();
-            miJuego.setAccion(false);
-            SwingUtilities.updateComponentTreeUI(contenedorInicial);
+                miJuego.compararBaldosas();
+                disminuirTiempo();
+                finDelJuego();
+                if(miJuego.getPausa()){
+                    //Nada
+                }else{
+                    miJuego.cambiarBaldosa();
+                }
+                pintar();
+                entreRonda.start();
+                miJuego.setAccion(false);
+                SwingUtilities.updateComponentTreeUI(contenedorInicial);
+                
+                lblPuntaje.setText("Puntaje: " + miJuego.getPuntaje());
+                lblVidas.setText("Vidas: " + miJuego.getNumVidas());
         }));
-        
         timerGame.start();
         
+        entreRonda = new Timer(1,(e)->{
+            if(miJuego.getPausa()){
+                pausa += 1;
+                if(pausa == 1){
+                    pintar();
+                }
+                else if(pausa >= 200){
+                    pausa = 0;
+                    miJuego.setPausa(false);
+                    pintar();
+                    miJuego.cambiarRonda();
+                    miJuego.setHayAcierto(false);
+                    miJuego.setHayFallo(false);
+                    entreRonda.stop();
+                    timerGame.start();
+                }
+            }
+            else{
+                entreRonda.stop();
+            }
+        });
         SwingUtilities.updateComponentTreeUI(contenedorInicial);
     }
     
     public void disminuirTiempo(){
         if(miJuego.getHayAcierto()){
-            timerGame.stop();
+            timerGame.stop();            
             timerGame = new Timer(miJuego.getTiempo(),((e) -> {
                 miJuego.compararBaldosas();
                 disminuirTiempo();
                 finDelJuego();
-                lblPuntaje.setText("Puntaje: " + miJuego.getPuntaje());
-                lblVidas.setText("Vidas: " + miJuego.getNumVidas());
-                miJuego.cambiarBaldosa();
+                if(miJuego.getPausa()){
+                    //Nada
+                }else{
+                    miJuego.cambiarBaldosa();
+                }
                 pintar();
+                entreRonda.start();
                 miJuego.setAccion(false);
                 SwingUtilities.updateComponentTreeUI(contenedorInicial);
+                
+                lblPuntaje.setText("Puntaje: " + miJuego.getPuntaje());
+                lblVidas.setText("Vidas: " + miJuego.getNumVidas());
             }));
             timerGame.start();
         }
@@ -467,8 +578,12 @@ public class VentanaPrincipal extends JFrame{
                 iniciarJuego();
             }
             if(e.getSource() == lblBoton){
-                miJuego.setAccion(true);
-                System.out.println("Presionado");
+                if(entreRonda.isRunning()){
+                    //No puede cambiar el estado de accion a true
+                }
+                else{
+                    miJuego.setAccion(true);
+                }
             }
         }
 
@@ -495,7 +610,12 @@ public class VentanaPrincipal extends JFrame{
         public void keyPressed(KeyEvent ke){
             if(seccion == 5){
                 if(ke.getKeyCode() == 32){
-                    miJuego.setAccion(true);
+                    if(entreRonda.isRunning()){
+                        //No puede cambiar el estado de accion a true
+                    }
+                    else{
+                        miJuego.setAccion(true);
+                    }
                 }
             }           
         }

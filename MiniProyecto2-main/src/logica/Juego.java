@@ -20,20 +20,26 @@ public class Juego {
     private int aciertos;
     private int errores;
     private int tiempo;
+    private int baldosaCambiada;
     private boolean accion;
     private boolean hayAcierto;
+    private boolean hayFallo;
     private boolean finDelJuego;
+    private boolean pausa;
     
     public Juego()
     {
-        numVidas = 3;
+        numVidas = 300;
         puntaje = 0;
         aciertos = 0;
         errores = 0;
         tiempo = 3000;
+        baldosaCambiada = -1;
         accion = false;
         hayAcierto = false;
+        hayFallo = false;
         finDelJuego = false;
+        pausa = false;
         baldosas = new ArrayList<Baldosa>();
         posiciones = new ArrayList<Integer>();
         idBaldosas = new ArrayList<Integer>();
@@ -51,6 +57,18 @@ public class Juego {
     
     public void setAccion(boolean accion){
         this.accion = accion;
+    }
+    
+    public void setHayAcierto(boolean hayAcierto){
+        this.hayAcierto = hayAcierto;
+    }
+    
+    public void setHayFallo(boolean hayFallo){
+        this.hayFallo = hayFallo;
+    }
+    
+    public void setPausa(boolean pausa){
+        this.pausa = pausa;
     }
     
     public ArrayList <Baldosa> getBaldosas(){
@@ -89,6 +107,18 @@ public class Juego {
         return hayAcierto;
     }
     
+    public boolean getHayFallo(){
+        return hayFallo;
+    }
+    
+    public boolean getPausa(){
+        return pausa;
+    }
+    
+    public int getBaldosaCambiada(){
+        return baldosaCambiada;
+    }
+    
     public void iniciarJuego(){
         cambiarIDs();
         asignarPosiciones();
@@ -109,6 +139,22 @@ public class Juego {
         }
     }
     
+    public void cambiarRonda(){
+        desasignarPosiciones();
+        if(hayAcierto){
+            if(baldosas.size() < 8){
+                baldosas.add(new Baldosa());
+            }
+        }
+        else if(hayFallo){
+            if(baldosas.size() > 3){
+                baldosas.remove(baldosas.size() - 1);
+            }
+        }
+        asignarPosiciones();
+        cambiarIDs();
+    }
+    
     public void cambiarIDs(){
         for(Baldosa baldosa : baldosas){
             int random = (int)(Math.random() * idBaldosas.size());
@@ -118,26 +164,25 @@ public class Juego {
         for(Baldosa baldosa : baldosas){
             idBaldosas.add(baldosa.getID());
         }
+        hayAcierto = false;
+        hayFallo = false;
     }
     
     public void cambiarBaldosa(){
         int random = (int)(Math.random() * baldosas.size());
         
         baldosas.get(random).setID();
+        baldosaCambiada = baldosas.get(random).getPosicion();
     }
     
     public void acierto(){
-        desasignarPosiciones();
-        if(baldosas.size() < 8){
-            baldosas.add(new Baldosa());
-        }
-        asignarPosiciones();
-        cambiarIDs();
         puntaje += 100;
         accion = false;
         aciertos += 1;
         tiempo = tiempo - (tiempo*5/100);
+        baldosaCambiada = -1;
         hayAcierto = true;
+        pausa = true;
     }
     
     public void fallo(){
@@ -146,13 +191,9 @@ public class Juego {
         if(numVidas == 0){
             finDelJuego = true;
         }else{
-            desasignarPosiciones();
-            if(baldosas.size() > 3){
-                baldosas.remove(baldosas.size() - 1);
-            }
-            asignarPosiciones();
-            cambiarIDs();
+            hayFallo = true;
         }
+        pausa = true;
     }
        
     public void compararBaldosas(){
