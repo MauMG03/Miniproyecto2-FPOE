@@ -29,7 +29,7 @@ public class Juego {
     
     public Juego()
     {
-        numVidas = 300;
+        numVidas = 3;
         puntaje = 0;
         aciertos = 0;
         errores = 0;
@@ -75,20 +75,12 @@ public class Juego {
         return baldosas;
     }
     
-    public int getPuntaje(){
-        return puntaje;
-    }
-    
     public int getNumVidas(){
         return numVidas;
     }
     
-    public boolean getAccion(){
-        return accion;
-    }
-    
-    public boolean getFinDelJuego(){
-        return finDelJuego;
+    public int getPuntaje(){
+        return puntaje;
     }
     
     public int getAciertos(){
@@ -103,6 +95,14 @@ public class Juego {
         return tiempo;
     }
     
+    public int getBaldosaCambiada(){
+        return baldosaCambiada;
+    }
+    
+    public boolean getAccion(){
+        return accion;
+    }
+    
     public boolean getHayAcierto(){
         return hayAcierto;
     }
@@ -111,12 +111,12 @@ public class Juego {
         return hayFallo;
     }
     
-    public boolean getPausa(){
-        return pausa;
+    public boolean getFinDelJuego(){
+        return finDelJuego;
     }
     
-    public int getBaldosaCambiada(){
-        return baldosaCambiada;
+    public boolean getPausa(){
+        return pausa;
     }
     
     public void iniciarJuego(){

@@ -3,9 +3,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package interfaz;
+import java.applet.AudioClip;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -16,6 +18,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -45,24 +48,33 @@ public class VentanaPrincipal extends JFrame{
     private int seccion;
     private int pausa;
     
+    private fondoJuego pnlFondo;
+    
     private Juego miJuego;
     private ImageIcon[] imagenes = new ImageIcon[20];
+    private ImageIcon fondo;
     private JLabel[] lblBaldosas = new JLabel[8];
     
     private Timer timerGame;
     private Timer entreRonda;
     
+    private AudioClip prueba;
+    private AudioClip cambioBS;
+    private AudioClip successS;
+    private AudioClip falloS;
     
     private Container contenedorInicial;
     public VentanaPrincipal()
     {
+        pnlFondo = new fondoJuego();
+        this.setContentPane(pnlFondo);
         iniciarComponentes();   
         setSize(700,700);
         setVisible(true);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
-        setTitle("Pair Colors");
+        setTitle("Adosa2");
         setResizable(false);
         SwingUtilities.updateComponentTreeUI(contenedorInicial);
     }
@@ -70,10 +82,11 @@ public class VentanaPrincipal extends JFrame{
     private void iniciarComponentes()
     {
         cargarImagenes();
+        asignarSonidos();
         seccion = 0;
         pausa = 0;
         
-        lblTitle = new JLabel("Pair Colors", SwingConstants.CENTER);
+        lblTitle = new JLabel("Adosa2", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Serif", Font.PLAIN, 50));
         lblTitle.setBounds(90,50,500,70);
         
@@ -185,6 +198,30 @@ public class VentanaPrincipal extends JFrame{
         }
     }
     
+    public void asignarSonidos(){
+        successS = java.applet.Applet.newAudioClip(
+                (getClass().getResource("/sonidos/aciertoS.wav")));
+
+        cambioBS = java.applet.Applet.newAudioClip(
+                (getClass().getResource("/sonidos/cambioB.wav")));
+        
+        falloS = java.applet.Applet.newAudioClip(
+                (getClass().getResource("/sonidos/fallo.wav")));
+    }
+    
+    public void reproducirSonidos(){
+        if(!miJuego.getHayAcierto() && !miJuego.getHayFallo()){                        
+            cambioBS.play();
+        }
+        if(miJuego.getHayAcierto()){
+            successS.play();
+        }
+        if(miJuego.getHayFallo()){
+            falloS.play();
+        }
+        
+    }
+    
     public void posicionarLblBaldosas(){
         lblBaldosas[0] = new JLabel();
         lblBaldosas[0].setBounds(300,30,85,85);
@@ -236,15 +273,15 @@ public class VentanaPrincipal extends JFrame{
                                     setIcon(imagenes[baldosa.getID()]);
         }
         
-        Border border = BorderFactory.createLineBorder(Color.GRAY, 3,true);
+        Border borderC = BorderFactory.createLineBorder(Color.cyan, 3,true);
         Border borderG = BorderFactory.createLineBorder(Color.GREEN, 3,true);
         Border borderR = BorderFactory.createLineBorder(Color.RED, 3,true);
         
         if(miJuego.getBaldosaCambiada() == 0){
-            lblBaldosas[miJuego.getBaldosaCambiada()].setBorder(border);
+            lblBaldosas[miJuego.getBaldosaCambiada()].setBorder(borderC);
         }
         else if(miJuego.getBaldosaCambiada() > 0){
-            lblBaldosas[miJuego.getBaldosaCambiada()-1].setBorder(border);
+            lblBaldosas[miJuego.getBaldosaCambiada()-1].setBorder(borderC);
         }
         else{
             //no pinta borde
@@ -298,6 +335,7 @@ public class VentanaPrincipal extends JFrame{
         }
     }
     
+    
     public void pintarBordesPares(Border borde,int i,int j){
         for(int k = 0; k < lblBaldosas.length; k++){
             lblBaldosas[k].setBorder(null);
@@ -333,7 +371,7 @@ public class VentanaPrincipal extends JFrame{
             btnBack.setVisible(false);
             btnNext.setVisible(true);
 
-            lblInfo.setText("<html>En Pair Colors aparece en pantalla " 
+            lblInfo.setText("<html>En Adosa2 aparece en pantalla " 
                     + "una serie de baldosas.Las baldosas van cambiando de "
                     + "1 en 1 mostrando distintos diseños.<p>Podras saber "
                     + "que baldosa cambia en cada momento gracias a un "
@@ -386,7 +424,7 @@ public class VentanaPrincipal extends JFrame{
     }
     
     public void menuPrincipal(){
-        lblTitle.setText("Pair Colors");
+        lblTitle.setText("Adosa2");
         
         lblHTP.setEnabled(true);
         lblWP.setEnabled(true);
@@ -442,6 +480,7 @@ public class VentanaPrincipal extends JFrame{
                     miJuego.cambiarBaldosa();
                 }
                 pintar();
+                reproducirSonidos();
                 entreRonda.start();
                 miJuego.setAccion(false);
                 SwingUtilities.updateComponentTreeUI(contenedorInicial);
@@ -460,7 +499,6 @@ public class VentanaPrincipal extends JFrame{
                 else if(pausa >= 200){
                     pausa = 0;
                     miJuego.setPausa(false);
-                    pintar();
                     miJuego.cambiarRonda();
                     miJuego.setHayAcierto(false);
                     miJuego.setHayFallo(false);
@@ -488,6 +526,7 @@ public class VentanaPrincipal extends JFrame{
                     miJuego.cambiarBaldosa();
                 }
                 pintar();
+                reproducirSonidos();
                 entreRonda.start();
                 miJuego.setAccion(false);
                 SwingUtilities.updateComponentTreeUI(contenedorInicial);
@@ -618,6 +657,18 @@ public class VentanaPrincipal extends JFrame{
                     }
                 }
             }           
+        }
+    }
+    
+    class fondoJuego extends JPanel{
+        private Image imagen;
+        @Override
+        public void paint(Graphics g) {
+            imagen = new ImageIcon(getClass().getResource
+                                            ("/imagenes/fondo.jpg")).getImage();
+            g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
+            setOpaque(false);
+            super.paint(g);
         }
     }
 }

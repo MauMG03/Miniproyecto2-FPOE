@@ -25,12 +25,12 @@ public class Baldosa {
         this.id = id;
     }
     
-    public int getID(){
-        return id;
-    }
-    
     public void setPosicion(int posicion){
         this.posicion = posicion;
+    }
+    
+    public int getID(){
+        return id;
     }
     
     public int getPosicion(){
