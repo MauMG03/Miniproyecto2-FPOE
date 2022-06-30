@@ -53,8 +53,13 @@ public class VentanaPrincipal extends JFrame{
     private Juego miJuego;
     private ImageIcon[] imagenesB = new ImageIcon[20];
     private ImageIcon[] imagenesM = new ImageIcon[7];
-    private ImageIcon fondo;
     private JLabel[] lblBaldosas = new JLabel[8];
+    
+    private JLabel lblBocina;
+    private ImageIcon[] bocinaImg = new ImageIcon[2];
+    
+    private ImageIcon exitImg = new ImageIcon();
+    private ImageIcon botonImg = new ImageIcon();
     
     private Timer timerGame;
     private Timer entreRonda;
@@ -63,6 +68,8 @@ public class VentanaPrincipal extends JFrame{
     private AudioClip aciertoS;
     private AudioClip falloS;
     private AudioClip finS;
+    
+    private boolean sonido;
     
     private Container contenedorInicial;
     public VentanaPrincipal()
@@ -86,6 +93,7 @@ public class VentanaPrincipal extends JFrame{
         asignarSonidos();
         seccion = 0;
         pausa = 0;
+        sonido = true;
         
         lblTitle = new JLabel();
         lblTitle.setBounds(90,10,500,150);
@@ -105,11 +113,11 @@ public class VentanaPrincipal extends JFrame{
         
         lblInfo = new JLabel("");
         lblInfo.setFont(new Font("Serif", Font.PLAIN, 20));
-        lblInfo.setBounds(90,300,500,300);
+        lblInfo.setBounds(90,350,500,300);
         
-        lblExit = new JLabel("X");
+        lblExit = new JLabel();
         lblExit.setBounds(600,20,40,40);
-        lblExit.setFont(new Font("Serif", Font.PLAIN, 35));
+        lblExit.setIcon(exitImg);
         lblExit.setVisible(false);
         lblExit.setEnabled(false);
         
@@ -126,8 +134,8 @@ public class VentanaPrincipal extends JFrame{
         lblVidas.setEnabled(false);
         
         lblBoton = new JLabel("X");
-        lblBoton.setBounds(600,600,40,40);
-        lblBoton.setFont(new Font("Serif", Font.PLAIN, 35));
+        lblBoton.setBounds(550,510,65,65);
+        lblBoton.setIcon(botonImg);
         lblBoton.setVisible(false);
         lblBoton.setEnabled(false);
         
@@ -146,12 +154,18 @@ public class VentanaPrincipal extends JFrame{
         lblErrores.setBounds(180,420,320,70);
         lblErrores.setVisible(false);
         
+        lblBocina = new JLabel();
+        lblBocina.setBounds(80,500,80,80);
+        lblBocina.setIcon(bocinaImg[0]);
+        lblBocina.setEnabled(false);
+        lblBocina.setVisible(false);
+        
         btnNext = new JButton("Siguiente");
-        btnNext.setBounds(500, 550, 100, 30);
+        btnNext.setBounds(500, 600, 100, 30);
         btnNext.setVisible(false);
         
         btnBack = new JButton("Atras");
-        btnBack.setBounds(50,550,100,30);
+        btnBack.setBounds(50,600,100,30);
         btnBack.setVisible(false);
         
         contenedorInicial = getContentPane();
@@ -168,6 +182,7 @@ public class VentanaPrincipal extends JFrame{
         contenedorInicial.add(lblPuntajeFinal);
         contenedorInicial.add(lblAciertos);
         contenedorInicial.add(lblErrores);
+        contenedorInicial.add(lblBocina);
         contenedorInicial.add(btnNext);
         contenedorInicial.add(btnBack);
         posicionarLblBaldosas();
@@ -177,6 +192,7 @@ public class VentanaPrincipal extends JFrame{
         lblPlay.addMouseListener(new ManejadorEventos());
         lblExit.addMouseListener(new ManejadorEventos());
         lblBoton.addMouseListener(new ManejadorEventos());
+        lblBocina.addMouseListener(new ManejadorEventos());
         btnNext.addMouseListener(new ManejadorEventos());
         btnBack.addMouseListener(new ManejadorEventos());
         this.addKeyListener(new ManejadorEventos());
@@ -218,6 +234,24 @@ public class VentanaPrincipal extends JFrame{
             }
             i++;
         }
+        i = 0;
+        for(ImageIcon imagen : bocinaImg){
+            imagen = new ImageIcon(getClass().getResource
+                                        ("/imagenes/bocina-"+(i+1)+".png"));
+            Image image = (imagen).getImage().getScaledInstance
+                                        (80, 80, Image.SCALE_SMOOTH);
+            bocinaImg[i] = new ImageIcon(image);
+            i++;
+        }
+        exitImg = new ImageIcon(getClass().getResource("/imagenes/exit.png"));
+        Image imageAux = (exitImg).getImage().getScaledInstance
+                                        (40, 40, Image.SCALE_SMOOTH);
+        exitImg = new ImageIcon(imageAux);
+        
+        botonImg = new ImageIcon(getClass().getResource("/imagenes/boton.png"));
+        imageAux = (botonImg).getImage().getScaledInstance
+                                        (65, 65, Image.SCALE_SMOOTH);
+        botonImg = new ImageIcon(imageAux);
     }
     
     public void asignarSonidos(){
@@ -235,18 +269,23 @@ public class VentanaPrincipal extends JFrame{
     }
     
     public void reproducirSonidos(){
-        if(!miJuego.getHayAcierto() && 
+        if(sonido){
+            if(!miJuego.getHayAcierto() && 
                     !miJuego.getHayFallo() && 
                     !miJuego.getFinDelJuego()){                        
             cambioBS.play();
-        }
-        if(miJuego.getHayAcierto()){
-            aciertoS.play();
-        }
-        if(miJuego.getHayFallo()){
-            falloS.play();
-        }
-        
+            }
+            if(miJuego.getHayAcierto()){
+                aciertoS.play();
+            }
+            if(miJuego.getHayFallo()){
+                falloS.play();
+            }
+        }else{
+            cambioBS.stop();
+            aciertoS.stop();
+            falloS.stop();
+        }     
     }
     
     public void posicionarLblBaldosas(){
@@ -292,7 +331,6 @@ public class VentanaPrincipal extends JFrame{
     }
     
     public void pintar(){
-        
         for(int i = 0; i < lblBaldosas.length;i++){
             lblBaldosas[i].setIcon(null);
             lblBaldosas[i].setBorder(null);
@@ -475,6 +513,7 @@ public class VentanaPrincipal extends JFrame{
         lblPuntaje.setEnabled(true);
         lblVidas.setEnabled(true);
         lblBoton.setEnabled(true);
+        lblBocina.setEnabled(true);
         
         lblHTP.setVisible(false);
         lblWP.setVisible(false);
@@ -482,6 +521,7 @@ public class VentanaPrincipal extends JFrame{
         lblPuntaje.setVisible(true);
         lblVidas.setVisible(true);
         lblBoton.setVisible(true);
+        lblBocina.setVisible(true);
         
         mostrarBaldosas();
         miJuego = new Juego();
@@ -568,7 +608,9 @@ public class VentanaPrincipal extends JFrame{
                 
             }else{
                 timerGame.stop();
-                finS.play();
+                if(sonido){
+                    finS.play();
+                }
                 for(int i = 0; i < lblBaldosas.length;i++){
                     lblBaldosas[i].setIcon(null);
                     lblBaldosas[i].setVisible(false);
@@ -651,6 +693,14 @@ public class VentanaPrincipal extends JFrame{
                     miJuego.setAccion(true);
                 }
             }
+            if(e.getSource() == lblBocina){
+                sonido = !sonido;
+                if(sonido){
+                    lblBocina.setIcon(bocinaImg[0]);
+                }else{
+                    lblBocina.setIcon(bocinaImg[1]);
+                }
+            }
         }
 
         @Override
@@ -709,7 +759,7 @@ public class VentanaPrincipal extends JFrame{
         @Override
         public void paint(Graphics g) {
             imagen = new ImageIcon(getClass().getResource
-                                            ("/imagenes/fondo.jpg")).getImage();
+                                            ("/imagenes/fondo.png")).getImage();
             g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
             setOpaque(false);
             super.paint(g);
