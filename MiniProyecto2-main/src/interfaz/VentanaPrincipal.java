@@ -51,17 +51,18 @@ public class VentanaPrincipal extends JFrame{
     private fondoJuego pnlFondo;
     
     private Juego miJuego;
-    private ImageIcon[] imagenes = new ImageIcon[20];
+    private ImageIcon[] imagenesB = new ImageIcon[20];
+    private ImageIcon[] imagenesM = new ImageIcon[7];
     private ImageIcon fondo;
     private JLabel[] lblBaldosas = new JLabel[8];
     
     private Timer timerGame;
     private Timer entreRonda;
     
-    private AudioClip prueba;
     private AudioClip cambioBS;
-    private AudioClip successS;
+    private AudioClip aciertoS;
     private AudioClip falloS;
+    private AudioClip finS;
     
     private Container contenedorInicial;
     public VentanaPrincipal()
@@ -86,21 +87,21 @@ public class VentanaPrincipal extends JFrame{
         seccion = 0;
         pausa = 0;
         
-        lblTitle = new JLabel("Adosa2", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("Serif", Font.PLAIN, 50));
-        lblTitle.setBounds(90,50,500,70);
+        lblTitle = new JLabel();
+        lblTitle.setBounds(90,10,500,150);
+        lblTitle.setIcon(imagenesM[0]);
         
-        lblHTP = new JLabel("Como Jugar");
-        lblHTP.setFont(new Font("Serif", Font.PLAIN, 40));
-        lblHTP.setBounds(100,300,195,70);
+        lblHTP = new JLabel();
+        lblHTP.setBounds(90,290,200,80);
+        lblHTP.setIcon(imagenesM[3]);
         
-        lblWP = new JLabel("Por que Jugar");
-        lblWP.setFont(new Font("Serif", Font.PLAIN, 40));
-        lblWP.setBounds(350,300,220,70);
+        lblWP = new JLabel();
+        lblWP.setBounds(360,290,240,85);
+        lblWP.setIcon(imagenesM[5]);
         
         lblPlay = new JLabel("Jugar");
-        lblPlay.setFont(new Font("Serif", Font.PLAIN, 40));
-        lblPlay.setBounds(280,380,90,70);
+        lblPlay.setBounds(235,410,200,70);
+        lblPlay.setIcon(imagenesM[2]);
         
         lblInfo = new JLabel("");
         lblInfo.setFont(new Font("Serif", Font.PLAIN, 20));
@@ -183,23 +184,44 @@ public class VentanaPrincipal extends JFrame{
     
     public void cargarImagenes(){
         int i = 0;
-        for (ImageIcon imagen : imagenes){
-            try {
-                imagen = new ImageIcon(getClass().getResource
-                                        ("/imagenes/"+(i+1)+".png"));
-            } catch (Exception e) {
-                imagen = new ImageIcon(getClass().getResource
-                                        ("/imagenes/"+(i+1)+".jpg"));
-            }
+        for (ImageIcon imagen : imagenesB){
+            imagen = new ImageIcon(getClass().getResource
+                                        ("/imagenes/baldosa-"+(i+1)+".png"));
             Image image = (imagen).getImage().getScaledInstance
                                         (80, 80, Image.SCALE_SMOOTH);
-            imagenes[i]= new ImageIcon(image);
+            imagenesB[i] = new ImageIcon(image);
+            i++;
+        }
+        i = 0;
+        for(ImageIcon imagen : imagenesM){
+            imagen = new ImageIcon(getClass().getResource
+                                        ("/imagenes/adosa2-0"+(i+1)+".png"));
+            if(i == 0){
+                Image image = (imagen).getImage().getScaledInstance
+                                        (500, 150, Image.SCALE_SMOOTH);
+                imagenesM[i] = new ImageIcon(image);
+            }
+            else if(i == 1 || i == 2){
+                Image image = (imagen).getImage().getScaledInstance
+                                        (200, 70, Image.SCALE_SMOOTH);
+                imagenesM[i] = new ImageIcon(image);
+            }
+            else if(i == 5 || i == 6){
+                Image image = (imagen).getImage().getScaledInstance
+                                        (240, 85, Image.SCALE_SMOOTH);
+                imagenesM[i] = new ImageIcon(image);
+            }
+            else{
+                Image image = (imagen).getImage().getScaledInstance
+                                        (200, 80, Image.SCALE_SMOOTH);
+                imagenesM[i] = new ImageIcon(image);
+            }
             i++;
         }
     }
     
     public void asignarSonidos(){
-        successS = java.applet.Applet.newAudioClip(
+        aciertoS = java.applet.Applet.newAudioClip(
                 (getClass().getResource("/sonidos/aciertoS.wav")));
 
         cambioBS = java.applet.Applet.newAudioClip(
@@ -207,14 +229,19 @@ public class VentanaPrincipal extends JFrame{
         
         falloS = java.applet.Applet.newAudioClip(
                 (getClass().getResource("/sonidos/fallo.wav")));
+        
+        finS = java.applet.Applet.newAudioClip(
+                (getClass().getResource("/sonidos/fin.wav")));
     }
     
     public void reproducirSonidos(){
-        if(!miJuego.getHayAcierto() && !miJuego.getHayFallo()){                        
+        if(!miJuego.getHayAcierto() && 
+                    !miJuego.getHayFallo() && 
+                    !miJuego.getFinDelJuego()){                        
             cambioBS.play();
         }
         if(miJuego.getHayAcierto()){
-            successS.play();
+            aciertoS.play();
         }
         if(miJuego.getHayFallo()){
             falloS.play();
@@ -223,29 +250,31 @@ public class VentanaPrincipal extends JFrame{
     }
     
     public void posicionarLblBaldosas(){
+        int size = 88;
+        
         lblBaldosas[0] = new JLabel();
-        lblBaldosas[0].setBounds(300,30,85,85);
+        lblBaldosas[0].setBounds(300,30,size,size);
         
         lblBaldosas[1] = new JLabel();
-        lblBaldosas[1].setBounds(300,130,85,85);
+        lblBaldosas[1].setBounds(300,130,size,size);
         
         lblBaldosas[2] = new JLabel();
-        lblBaldosas[2].setBounds(70,250,85,85);
+        lblBaldosas[2].setBounds(70,250,size,size);
         
         lblBaldosas[3] = new JLabel();
-        lblBaldosas[3].setBounds(170,250,85,85);
+        lblBaldosas[3].setBounds(170,250,size,size);
         
         lblBaldosas[4] = new JLabel();
-        lblBaldosas[4].setBounds(430,250,85,85);
-        
+        lblBaldosas[4].setBounds(430,250,size,size);
+       
         lblBaldosas[5] = new JLabel();
-        lblBaldosas[5].setBounds(530,250,85,85);
+        lblBaldosas[5].setBounds(530,250,size,size);
         
         lblBaldosas[6] = new JLabel();
-        lblBaldosas[6].setBounds(300,370,85,85);
+        lblBaldosas[6].setBounds(300,370,size,size);
         
         lblBaldosas[7] = new JLabel();
-        lblBaldosas[7].setBounds(300,470,85,85);
+        lblBaldosas[7].setBounds(300,470,size,size);
       
         for(JLabel baldosa : lblBaldosas){
             baldosa.setEnabled(false);
@@ -270,12 +299,12 @@ public class VentanaPrincipal extends JFrame{
         }
         for(Baldosa baldosa : miJuego.getBaldosas()){
             lblBaldosas[baldosa.getPosicion()-1].
-                                    setIcon(imagenes[baldosa.getID()]);
+                                    setIcon(imagenesB[baldosa.getID()]);
         }
         
-        Border borderC = BorderFactory.createLineBorder(Color.cyan, 3,true);
-        Border borderG = BorderFactory.createLineBorder(Color.GREEN, 3,true);
-        Border borderR = BorderFactory.createLineBorder(Color.RED, 3,true);
+        Border borderC = BorderFactory.createLineBorder(Color.cyan, 4,true);
+        Border borderG = BorderFactory.createLineBorder(Color.GREEN, 4,true);
+        Border borderR = BorderFactory.createLineBorder(Color.RED, 4,true);
         
         if(miJuego.getBaldosaCambiada() == 0){
             lblBaldosas[miJuego.getBaldosaCambiada()].setBorder(borderC);
@@ -302,7 +331,7 @@ public class VentanaPrincipal extends JFrame{
                 }
             }
         }
-        if(miJuego.getHayFallo()){
+        if(miJuego.getHayFallo() || miJuego.getNumVidas() == 0){
             for(int i = 0; i < miJuego.getBaldosas().size();i++){
                 for(int j = 0; j < miJuego.getBaldosas().size();j++){
                     if(i == miJuego.getBaldosas().size()-1 &&
@@ -356,7 +385,6 @@ public class VentanaPrincipal extends JFrame{
     
     public void seccionTutorial(){
         if(seccion == 1){
-            lblTitle.setText("Como Jugar");
             
             lblHTP.setEnabled(false);
             lblWP.setEnabled(false);
@@ -401,9 +429,7 @@ public class VentanaPrincipal extends JFrame{
         }
     }
     
-    public void pQJugar(){
-        lblTitle.setText("¿Por qué Jugar?");
-        
+    public void pQJugar(){    
         lblHTP.setEnabled(false);
         lblWP.setEnabled(false);
         lblPlay.setEnabled(false);
@@ -423,9 +449,7 @@ public class VentanaPrincipal extends JFrame{
                 + "palabras escritas.<html>");
     }
     
-    public void menuPrincipal(){
-        lblTitle.setText("Adosa2");
-        
+    public void menuPrincipal(){      
         lblHTP.setEnabled(true);
         lblWP.setEnabled(true);
         lblPlay.setEnabled(true);
@@ -443,8 +467,6 @@ public class VentanaPrincipal extends JFrame{
     }
     
     public void iniciarJuego(){
-        
-        lblTitle.setText("");
         lblTitle.setVisible(false);
         
         lblHTP.setEnabled(false);
@@ -500,6 +522,7 @@ public class VentanaPrincipal extends JFrame{
                     pausa = 0;
                     miJuego.setPausa(false);
                     miJuego.cambiarRonda();
+                    pintar();
                     miJuego.setHayAcierto(false);
                     miJuego.setHayFallo(false);
                     entreRonda.stop();
@@ -508,6 +531,7 @@ public class VentanaPrincipal extends JFrame{
             }
             else{
                 entreRonda.stop();
+                finDelJuego();
             }
         });
         SwingUtilities.updateComponentTreeUI(contenedorInicial);
@@ -540,29 +564,32 @@ public class VentanaPrincipal extends JFrame{
     
     public void finDelJuego(){
         if(miJuego.getFinDelJuego()){
-            timerGame.stop();
-            
-            for(int i = 0; i < lblBaldosas.length;i++){
-                lblBaldosas[i].setIcon(null);
-                lblBaldosas[i].setVisible(false);
-            }
-            
-            lblPuntaje.setVisible(false);
-            lblVidas.setVisible(false);
-            lblBoton.setVisible(false);
-            lblBoton.setEnabled(false);
-            lblTitle.setVisible(true);
-            
-            lblPuntajeFinal.setVisible(true);
-            lblAciertos.setVisible(true);
-            lblErrores.setVisible(true);
-            
-            lblTitle.setText("FIN DEL JUEGO");
-            lblPuntajeFinal.setText("Puntaje: " + miJuego.getPuntaje());
-            lblAciertos.setText("Aciertos: " + miJuego.getAciertos());
-            lblErrores.setText("Errores: " + miJuego.getErrores());
-            
-            SwingUtilities.updateComponentTreeUI(contenedorInicial);
+            if(!entreRonda.isRunning()){
+                
+            }else{
+                timerGame.stop();
+                finS.play();
+                for(int i = 0; i < lblBaldosas.length;i++){
+                    lblBaldosas[i].setIcon(null);
+                    lblBaldosas[i].setVisible(false);
+                }
+
+                lblPuntaje.setVisible(false);
+                lblVidas.setVisible(false);
+                lblBoton.setVisible(false);
+                lblBoton.setEnabled(false);
+                lblTitle.setVisible(true);
+
+                lblPuntajeFinal.setVisible(true);
+                lblAciertos.setVisible(true);
+                lblErrores.setVisible(true);
+
+                lblPuntajeFinal.setText("Puntaje: " + miJuego.getPuntaje());
+                lblAciertos.setText("Aciertos: " + miJuego.getAciertos());
+                lblErrores.setText("Errores: " + miJuego.getErrores());
+
+                SwingUtilities.updateComponentTreeUI(contenedorInicial);
+            }     
         }
     }
     
@@ -638,11 +665,28 @@ public class VentanaPrincipal extends JFrame{
 
         @Override
         public void mouseEntered(MouseEvent e) {
-        
+            if(e.getSource() == lblHTP){
+                lblHTP.setIcon(imagenesM[4]);
+            }
+            if(e.getSource() == lblWP){
+                lblWP.setIcon(imagenesM[6]);
+            }
+            if(e.getSource() == lblPlay){
+                lblPlay.setIcon(imagenesM[1]);
+            }
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
+            if(e.getSource() == lblHTP){
+                lblHTP.setIcon(imagenesM[3]);
+            }
+            if(e.getSource() == lblWP){
+                lblWP.setIcon(imagenesM[5]);
+            }
+            if(e.getSource() == lblPlay){
+                lblPlay.setIcon(imagenesM[2]);
+            }
         }
         
         @Override
