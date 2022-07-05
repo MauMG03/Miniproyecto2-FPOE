@@ -166,6 +166,7 @@ public class Juego {
         }
         hayAcierto = false;
         hayFallo = false;
+        baldosaCambiada = -1;
     }
     
     public void cambiarBaldosa(){
