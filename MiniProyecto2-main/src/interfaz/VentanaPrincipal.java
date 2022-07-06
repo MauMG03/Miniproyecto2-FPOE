@@ -29,9 +29,17 @@ import logica.Baldosa;
 import logica.Juego;
 
 /**
- *
- * @author jose9
+ * @author Mauricio Munoz Gutierrez
+ * @author Jose Luis Hincapie Bucheli
+ * 
+ * Profesor Luis Johany Romo Portilla
+ * 
+ * Fundamentos de Programacion Orientada por Eventos
+ * Grupo 1
+ * 
+ * Miniproyecto 2
  */
+
 public class VentanaPrincipal extends JFrame{
     private JLabel lblTitle;
     private JLabel lblHTP;
@@ -87,7 +95,8 @@ public class VentanaPrincipal extends JFrame{
     {
         pnlFondo = new fondoJuego();
         this.setContentPane(pnlFondo);
-        iniciarComponentes();   
+        iniciarComponentes();
+        this.setIconImage(imagenesM[0].getImage());
         setSize(700,700);
         setVisible(true);
         setLocationRelativeTo(null);
@@ -301,13 +310,16 @@ public class VentanaPrincipal extends JFrame{
             if(!miJuego.getHayAcierto() && 
                     !miJuego.getHayFallo() && 
                     !miJuego.getFinDelJuego()){                        
-            cambioBS.play();
+                cambioBS.play();
             }
             if(miJuego.getHayAcierto()){
                 aciertoS.play();
             }
             if(miJuego.getHayFallo()){
                 falloS.play();
+            }
+            if(miJuego.getFinDelJuego()){
+                finS.play();
             }
         }else{
             cambioBS.stop();
@@ -623,6 +635,7 @@ public class VentanaPrincipal extends JFrame{
         
         entreRonda = new Timer(1,(e)->{
             if(miJuego.getPausa()){
+                timerGame.stop();
                 pausa += 1;
                 if(pausa == 1){
                     pintar();
@@ -634,14 +647,14 @@ public class VentanaPrincipal extends JFrame{
                     pintar();
                     miJuego.setHayAcierto(false);
                     miJuego.setHayFallo(false);
+                    finDelJuego();
                     entreRonda.stop();
                     timerGame.start();
-                    finDelJuego();
                 }
             }
             else{
-                entreRonda.stop();
                 finDelJuego();
+                entreRonda.stop();
             }
         });
         SwingUtilities.updateComponentTreeUI(contenedorInicial);
@@ -681,7 +694,6 @@ public class VentanaPrincipal extends JFrame{
                 lblBocina.setVisible(false);
                 lblBocina.setEnabled(false);
                 if(sonido){
-                    finS.play();
                 }
                 for(int i = 0; i < lblBaldosas.length;i++){
                     lblBaldosas[i].setIcon(null);

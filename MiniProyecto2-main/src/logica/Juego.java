@@ -7,9 +7,17 @@ package logica;
 import java.util.ArrayList;
 
 /**
- *
- * @author jose9
+ * @author Mauricio Munoz Gutierrez
+ * @author Jose Luis Hincapie Bucheli
+ * 
+ * Profesor Luis Johany Romo Portilla
+ * 
+ * Fundamentos de Programacion Orientada por Eventos
+ * Grupo 1
+ * 
+ * Miniproyecto 2
  */
+
 public class Juego {
     
     private ArrayList <Baldosa> baldosas;
