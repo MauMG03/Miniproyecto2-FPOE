@@ -398,7 +398,7 @@ public class VentanaPrincipal extends JFrame{
             }
         }
         if(miJuego.getHayFallo() || miJuego.getNumVidas() == 0){
-            animateHeart();
+            animarCorazones();
             for(int i = 0; i < miJuego.getBaldosas().size();i++){
                 for(int j = 0; j < miJuego.getBaldosas().size();j++){
                     if(i == miJuego.getBaldosas().size()-1 &&
@@ -448,7 +448,7 @@ public class VentanaPrincipal extends JFrame{
         }
     }
     
-        private void animateHeart()
+        private void animarCorazones()
     {
         sprites=0;
         timerAnimation = new Timer(100, (ActionEvent e) -> {
